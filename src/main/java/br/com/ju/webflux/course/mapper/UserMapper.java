@@ -8,6 +8,7 @@ import org.mapstruct.Mapping;
 
 import br.com.ju.webflux.course.entity.User;
 import br.com.ju.webflux.course.model.request.UserRequest;
+import br.com.ju.webflux.course.model.response.UserResponse;
 
 @Mapper(
 		componentModel = "spring",
@@ -18,5 +19,7 @@ public interface UserMapper {
 	
 	@Mapping(target = "id", ignore = true)
 	User toEntity(final UserRequest request);
+	
+	UserResponse toResponse(final User entity);
 
 }
