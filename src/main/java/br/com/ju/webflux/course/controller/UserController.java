@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 
 import br.com.ju.webflux.course.model.request.UserRequest;
 import br.com.ju.webflux.course.model.response.UserResponse;
+import jakarta.validation.Valid;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -18,7 +19,7 @@ import reactor.core.publisher.Mono;
 public interface UserController {
 	
 	@PostMapping
-	ResponseEntity<Mono<Void>> save(@RequestBody UserRequest request);
+	ResponseEntity<Mono<Void>> save(@Valid @RequestBody UserRequest request);
 	
 	@GetMapping(value = "/{id}")
 	ResponseEntity<Mono<UserResponse>> find(@PathVariable String id);
