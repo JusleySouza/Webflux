@@ -3,6 +3,8 @@ package br.com.ju.webflux.course.mapper.impl;
 import br.com.ju.webflux.course.entity.User;
 import br.com.ju.webflux.course.mapper.UserMapper;
 import br.com.ju.webflux.course.model.request.UserRequest;
+import br.com.ju.webflux.course.model.response.UserResponse;
+
 import javax.annotation.processing.Generated;
 import org.springframework.stereotype.Component;
 
@@ -34,5 +36,34 @@ public class UserMapperImpl implements UserMapper {
 
         return user.build();
     }
+
+	@Override
+	public UserResponse toResponse(User entity) {
+		if (entity == null) {
+			return null;
+		}
+		
+		String id = null;
+		String name = null;
+		String email = null;
+		String password = null;
+		
+		if ( entity.getId() != null ) {
+            id = entity.getId();
+        }
+		if ( entity.getName() != null ) {
+           name = entity.getName();
+        }
+        if ( entity.getEmail() != null ) {
+            email = entity.getEmail();
+        }
+        if ( entity.getPassword() != null ) {
+            password = entity.getPassword();
+        }
+        
+        UserResponse userResponse = new UserResponse(id, name, email, password);
+		
+		return userResponse;
+	}
 }
 
