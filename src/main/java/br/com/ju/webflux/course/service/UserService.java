@@ -1,13 +1,16 @@
 package br.com.ju.webflux.course.service;
 
-import org.springframework.stereotype.Service;
 import static java.lang.String.format;
+
+import org.springframework.stereotype.Service;
+
 import br.com.ju.webflux.course.entity.User;
 import br.com.ju.webflux.course.mapper.UserMapper;
 import br.com.ju.webflux.course.model.request.UserRequest;
 import br.com.ju.webflux.course.repository.UserRepository;
 import br.com.ju.webflux.course.service.exception.ObjectNotFoundException;
 import lombok.RequiredArgsConstructor;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 @Service
@@ -26,6 +29,10 @@ public class UserService {
 				.switchIfEmpty(Mono.error(
 						new ObjectNotFoundException(
 								format("Object not found. Id: %s, Type: %s ", id, User.class.getSimpleName()))));
+	}
+	
+	public Flux<User> findAll(){
+		return repository.findAll();
 	}
 
 }
