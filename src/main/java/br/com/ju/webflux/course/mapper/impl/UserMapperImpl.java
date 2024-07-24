@@ -36,6 +36,25 @@ public class UserMapperImpl implements UserMapper {
 
         return user.build();
     }
+    
+    @Override
+	public User toEntity(UserRequest request, User entity) {
+		if ( request == null ) {
+            return entity;
+        }
+
+        if ( request.name() != null ) {
+        	entity.setName( request.name() );
+        }
+        if ( request.email() != null ) {
+        	entity.setEmail( request.email() );
+        }
+        if ( request.password() != null ) {
+        	entity.setPassword( request.password() );
+        }
+
+        return entity;
+	}
 
 	@Override
 	public UserResponse toResponse(User entity) {
@@ -65,5 +84,6 @@ public class UserMapperImpl implements UserMapper {
 		
 		return userResponse;
 	}
+
 }
 
