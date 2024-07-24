@@ -47,8 +47,8 @@ public class UserControllerImpl implements UserController{
 
 	@Override
 	public ResponseEntity<Mono<Void>> delete(String id) {
-		// TODO Auto-generated method stub
-		return null;
+		return ResponseEntity.ok().body(
+				service.delete(id).then());
 	}
 
 }
