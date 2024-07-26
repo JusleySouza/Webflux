@@ -18,6 +18,7 @@ import br.com.ju.webflux.course.entity.User;
 import br.com.ju.webflux.course.mapper.UserMapper;
 import br.com.ju.webflux.course.model.request.UserRequest;
 import br.com.ju.webflux.course.repository.UserRepository;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 
@@ -63,5 +64,21 @@ class UserServiceTest {
 		
 		Mockito.verify(repository, times(1)).findById(anyString());
 	}
+	
+	@Test
+	void testFindAll() {
+		when(repository.findAll()).thenReturn(Flux.just(User.builder().build()));
+		
+		Flux<User> result = service.findAll();
+				
+		StepVerifier.create(result)
+		.expectNextMatches(user -> user.getClass() == User.class)
+		.expectComplete()
+		.verify();
+		
+		Mockito.verify(repository, times(1)).findAll();
+	}
+	
+	
 
 }
