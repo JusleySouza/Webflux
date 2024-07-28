@@ -5,6 +5,7 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.http.HttpStatus.BAD_REQUEST;
+import static org.springframework.http.HttpStatus.NOT_FOUND;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.web.reactive.function.BodyInserters.fromValue;
 import static reactor.core.publisher.Mono.just;
@@ -26,6 +27,7 @@ import br.com.ju.webflux.course.mapper.UserMapper;
 import br.com.ju.webflux.course.model.request.UserRequest;
 import br.com.ju.webflux.course.model.response.UserResponse;
 import br.com.ju.webflux.course.service.UserService;
+import br.com.ju.webflux.course.service.exception.ObjectNotFoundException;
 
 @ExtendWith(SpringExtension.class)
 @SpringBootTest
@@ -236,6 +238,21 @@ class UserControllerImplTest {
 		.jsonPath("$.name").isEqualTo(NAME)
 		.jsonPath("$.email").isEqualTo(EMAIL)
 		.jsonPath("$.password").isEqualTo(PASSWORD);
+	}
+	
+	@Test
+	@DisplayName("Test endpoint find by id with resource not found")
+	void testFindByIdResourceNotFound() {
+		
+		when(service.findById(anyString())).thenThrow(ObjectNotFoundException.class);
+		
+		webTestClient.get().uri("/users/" + ID)
+		.accept(APPLICATION_JSON)
+		.exchange()
+		.expectStatus().isNotFound()
+		.expectBody()
+		.jsonPath("$.status").isEqualTo(NOT_FOUND.value())
+		.jsonPath("$.error").isEqualTo("Not Found");
 	}
 	
 	@Test
