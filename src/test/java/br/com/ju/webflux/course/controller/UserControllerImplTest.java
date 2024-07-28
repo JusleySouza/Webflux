@@ -1,9 +1,11 @@
 package br.com.ju.webflux.course.controller;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.http.HttpStatus.BAD_REQUEST;
+import static org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.web.reactive.function.BodyInserters.fromValue;
 import static reactor.core.publisher.Mono.just;
@@ -15,6 +17,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.reactive.AutoConfigureWebTestClient;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.dao.DuplicateKeyException;
+import org.springframework.http.MediaType;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.reactive.server.WebTestClient;
 
@@ -23,6 +27,7 @@ import com.mongodb.reactivestreams.client.MongoClient;
 import br.com.ju.webflux.course.entity.User;
 import br.com.ju.webflux.course.mapper.UserMapper;
 import br.com.ju.webflux.course.model.request.UserRequest;
+import br.com.ju.webflux.course.model.response.UserResponse;
 import br.com.ju.webflux.course.service.UserService;
 
 @ExtendWith(SpringExtension.class)
@@ -210,7 +215,23 @@ class UserControllerImplTest {
 	}
 	
 	@Test
-	void testFindById() {
+	@DisplayName("Test endpoint find by id with success")
+	void testFindByIdWithSuccess() {
+		final var id = "123456";
+		final var userResponse = new UserResponse(id, "Sara Mello", "sara@mail.com", "1234");
+		
+		when(service.findById(anyString())).thenReturn(just(User.builder().build()));
+		when(mapper.toResponse(any(User.class))).thenReturn(userResponse);
+		
+		webTestClient.get().uri("/users/" + id)
+		.accept(APPLICATION_JSON)
+		.exchange()
+		.expectStatus().isOk()
+		.expectBody()
+		.jsonPath("$.id").isEqualTo(id)
+		.jsonPath("$.name").isEqualTo("Sara Mello")
+		.jsonPath("$.email").isEqualTo("sara@mail.com")
+		.jsonPath("$.password").isEqualTo("1234");
 	}
 	
 	@Test
