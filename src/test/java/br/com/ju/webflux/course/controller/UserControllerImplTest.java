@@ -116,7 +116,7 @@ class UserControllerImplTest {
 	@Test
 	@DisplayName("Test endpoint save with bad request by invalid email")
 	void testSaveWithBadRequestInvalidEmail() {
-		final var request = new UserRequest(" Sara Mello", "sara.mail.com", "123");
+		final var request = new UserRequest("Sara Mello", "sara.mail.com", "123");
 			
 		webTestClient.post().uri("/users")
 		.contentType(APPLICATION_JSON)
@@ -130,6 +130,25 @@ class UserControllerImplTest {
 		.jsonPath("$.message").isEqualTo("Error on validation attributes")
 		.jsonPath("$.errors[0].fieldName").isEqualTo("email")
 		.jsonPath("$.errors[0].message").isEqualTo("Invalid email");
+	}
+	
+	@Test
+	@DisplayName("Test endpoint save with bad request for empty email")
+	void testSaveWithBadRequestEmptyEmail() {
+		final var request = new UserRequest("Sara Mello", null, "123");
+			
+		webTestClient.post().uri("/users")
+		.contentType(APPLICATION_JSON)
+		.body(fromValue(request))
+		.exchange()
+		.expectStatus().isBadRequest()
+		.expectBody()
+		.jsonPath("$.path").isEqualTo("/users")
+		.jsonPath("$.status").isEqualTo(BAD_REQUEST.value())
+		.jsonPath("$.error").isEqualTo("Validation Error")
+		.jsonPath("$.message").isEqualTo("Error on validation attributes")
+		.jsonPath("$.errors[0].fieldName").isEqualTo("email")
+		.jsonPath("$.errors[0].message").isEqualTo("must not be null or empty");
 	}
 	
 	@Test
