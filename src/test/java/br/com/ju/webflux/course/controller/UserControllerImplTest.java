@@ -95,6 +95,25 @@ class UserControllerImplTest {
 	}
 	
 	@Test
+	@DisplayName("Test endpoint save with bad request for name length")
+	void testSaveWithBadRequestNameLength() {
+		final var request = new UserRequest("An", "sara@mail.com", "123");
+			
+		webTestClient.post().uri("/users")
+		.contentType(APPLICATION_JSON)
+		.body(fromValue(request))
+		.exchange()
+		.expectStatus().isBadRequest()
+		.expectBody()
+		.jsonPath("$.path").isEqualTo("/users")
+		.jsonPath("$.status").isEqualTo(BAD_REQUEST.value())
+		.jsonPath("$.error").isEqualTo("Validation Error")
+		.jsonPath("$.message").isEqualTo("Error on validation attributes")
+		.jsonPath("$.errors[0].fieldName").isEqualTo("name")
+		.jsonPath("$.errors[0].message").isEqualTo("must be between 3 and 50 characters");
+	}
+	
+	@Test
 	void testFindById() {
 	}
 	
