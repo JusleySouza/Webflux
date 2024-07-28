@@ -1,12 +1,12 @@
 package br.com.ju.webflux.course.controller;
 
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.when;
 import static org.mockito.Mockito.verify;
-import static reactor.core.publisher.Mono.just;
+import static org.mockito.Mockito.when;
+import static org.springframework.http.HttpStatus.BAD_REQUEST;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.web.reactive.function.BodyInserters.fromValue;
-import static org.springframework.http.HttpStatus.BAD_REQUEST;
+import static reactor.core.publisher.Mono.just;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -17,6 +17,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.reactive.server.WebTestClient;
+
 import com.mongodb.reactivestreams.client.MongoClient;
 
 import br.com.ju.webflux.course.entity.User;
@@ -149,6 +150,25 @@ class UserControllerImplTest {
 		.jsonPath("$.message").isEqualTo("Error on validation attributes")
 		.jsonPath("$.errors[0].fieldName").isEqualTo("email")
 		.jsonPath("$.errors[0].message").isEqualTo("must not be null or empty");
+	}
+	
+	@Test
+	@DisplayName("Test endpoint save with bad request for name with spaces at the beginning")
+	void testSaveWithBadRequestForPasswordWithSpaces() {
+		final var request = new UserRequest("Sara Mello", "sara@mail.com", " 123");
+			
+		webTestClient.post().uri("/users")
+		.contentType(APPLICATION_JSON)
+		.body(fromValue(request))
+		.exchange()
+		.expectStatus().isBadRequest()
+		.expectBody()
+		.jsonPath("$.path").isEqualTo("/users")
+		.jsonPath("$.status").isEqualTo(BAD_REQUEST.value())
+		.jsonPath("$.error").isEqualTo("Validation Error")
+		.jsonPath("$.message").isEqualTo("Error on validation attributes")
+		.jsonPath("$.errors[0].fieldName").isEqualTo("password")
+		.jsonPath("$.errors[0].message").isEqualTo("Field cannot have blank spaces at the beginning or at and");
 	}
 	
 	@Test

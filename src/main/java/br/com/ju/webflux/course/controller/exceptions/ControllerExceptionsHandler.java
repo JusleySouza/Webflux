@@ -28,10 +28,10 @@ public class ControllerExceptionsHandler {
 				.body(Mono.just(
 						StandardError.builder()
 						.timestamp(now())
+						.path(request.getPath().toString())
 						.status(BAD_REQUEST.value())
 						.error(BAD_REQUEST.getReasonPhrase())
 						.message(verifyDupKey(ex.getMessage()))
-						.path(request.getPath().toString())
 						.build()
 						));
 	}
