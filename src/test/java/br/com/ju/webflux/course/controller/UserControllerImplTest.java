@@ -5,7 +5,6 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.http.HttpStatus.BAD_REQUEST;
-import static org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.web.reactive.function.BodyInserters.fromValue;
 import static reactor.core.publisher.Mono.just;
@@ -17,8 +16,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.reactive.AutoConfigureWebTestClient;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.dao.DuplicateKeyException;
-import org.springframework.http.MediaType;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.reactive.server.WebTestClient;
 
@@ -35,6 +32,14 @@ import br.com.ju.webflux.course.service.UserService;
 @AutoConfigureWebTestClient
 class UserControllerImplTest {
 	
+	private static final String PASSWORD = "123";
+
+	private static final String EMAIL = "sara@mail.com";
+
+	private static final String NAME = "Sara Mello";
+
+	private static final String ID = "123456";
+
 	@Autowired
 	private WebTestClient webTestClient;
 	
@@ -50,7 +55,7 @@ class UserControllerImplTest {
 	@Test
 	@DisplayName("Test endpoint save and success")
 	void testSaveWithSuccess() {
-		final var request = new UserRequest("Sara Mello", "sara@mail.com", "123");
+		final var request = new UserRequest(NAME, EMAIL, PASSWORD);
 		
 		when(service.save(any(UserRequest.class))).thenReturn(just(User.builder().build()));
 		
@@ -65,7 +70,7 @@ class UserControllerImplTest {
 	@Test
 	@DisplayName("Test endpoint save with bad request for name with spaces at the beginning")
 	void testSaveWithBadRequestForNameWithSpaces() {
-		final var request = new UserRequest(" Sara Mello", "sara@mail.com", "123");
+		final var request = new UserRequest(NAME.concat(" "), EMAIL, PASSWORD);
 			
 		webTestClient.post().uri("/users")
 		.contentType(APPLICATION_JSON)
@@ -84,7 +89,7 @@ class UserControllerImplTest {
 	@Test
 	@DisplayName("Test endpoint save with bad request for empty name")
 	void testSaveWithBadRequestEmptyName() {
-		final var request = new UserRequest(null , "sara@mail.com", "123");
+		final var request = new UserRequest(null , EMAIL, PASSWORD);
 			
 		webTestClient.post().uri("/users")
 		.contentType(APPLICATION_JSON)
@@ -103,7 +108,7 @@ class UserControllerImplTest {
 	@Test
 	@DisplayName("Test endpoint save with bad request for name length")
 	void testSaveWithBadRequestNameLength() {
-		final var request = new UserRequest("An", "sara@mail.com", "123");
+		final var request = new UserRequest("An", EMAIL, PASSWORD);
 			
 		webTestClient.post().uri("/users")
 		.contentType(APPLICATION_JSON)
@@ -122,7 +127,7 @@ class UserControllerImplTest {
 	@Test
 	@DisplayName("Test endpoint save with bad request by invalid email")
 	void testSaveWithBadRequestInvalidEmail() {
-		final var request = new UserRequest("Sara Mello", "sara.mail.com", "123");
+		final var request = new UserRequest(NAME, "sara.mail.com", PASSWORD);
 			
 		webTestClient.post().uri("/users")
 		.contentType(APPLICATION_JSON)
@@ -141,7 +146,7 @@ class UserControllerImplTest {
 	@Test
 	@DisplayName("Test endpoint save with bad request for empty email")
 	void testSaveWithBadRequestEmptyEmail() {
-		final var request = new UserRequest("Sara Mello", null, "123");
+		final var request = new UserRequest(NAME, null, PASSWORD);
 			
 		webTestClient.post().uri("/users")
 		.contentType(APPLICATION_JSON)
@@ -160,7 +165,7 @@ class UserControllerImplTest {
 	@Test
 	@DisplayName("Test endpoint save with bad request for password with spaces at the beginning")
 	void testSaveWithBadRequestForPasswordWithSpaces() {
-		final var request = new UserRequest("Sara Mello", "sara@mail.com", " 123");
+		final var request = new UserRequest(NAME, EMAIL, PASSWORD.concat(" "));
 			
 		webTestClient.post().uri("/users")
 		.contentType(APPLICATION_JSON)
@@ -179,7 +184,7 @@ class UserControllerImplTest {
 	@Test
 	@DisplayName("Test endpoint save with bad request for empty password")
 	void testSaveWithBadRequestEmptyPassword() {
-		final var request = new UserRequest("Sara Mello" , "sara@mail.com", null);
+		final var request = new UserRequest(NAME , EMAIL, null);
 			
 		webTestClient.post().uri("/users")
 		.contentType(APPLICATION_JSON)
@@ -198,7 +203,7 @@ class UserControllerImplTest {
 	@Test
 	@DisplayName("Test endpoint save with bad request for password length")
 	void testSaveWithBadRequestPasswordLength() {
-		final var request = new UserRequest("Sara Mello", "sara@mail.com", "1");
+		final var request = new UserRequest(NAME, EMAIL, "1");
 			
 		webTestClient.post().uri("/users")
 		.contentType(APPLICATION_JSON)
@@ -217,21 +222,20 @@ class UserControllerImplTest {
 	@Test
 	@DisplayName("Test endpoint find by id with success")
 	void testFindByIdWithSuccess() {
-		final var id = "123456";
-		final var userResponse = new UserResponse(id, "Sara Mello", "sara@mail.com", "1234");
+		final var userResponse = new UserResponse(ID, NAME, EMAIL, PASSWORD);
 		
 		when(service.findById(anyString())).thenReturn(just(User.builder().build()));
 		when(mapper.toResponse(any(User.class))).thenReturn(userResponse);
 		
-		webTestClient.get().uri("/users/" + id)
+		webTestClient.get().uri("/users/" + ID)
 		.accept(APPLICATION_JSON)
 		.exchange()
 		.expectStatus().isOk()
 		.expectBody()
-		.jsonPath("$.id").isEqualTo(id)
-		.jsonPath("$.name").isEqualTo("Sara Mello")
-		.jsonPath("$.email").isEqualTo("sara@mail.com")
-		.jsonPath("$.password").isEqualTo("1234");
+		.jsonPath("$.id").isEqualTo(ID)
+		.jsonPath("$.name").isEqualTo(NAME)
+		.jsonPath("$.email").isEqualTo(EMAIL)
+		.jsonPath("$.password").isEqualTo(PASSWORD);
 	}
 	
 	@Test
