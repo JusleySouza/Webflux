@@ -428,5 +428,22 @@ class UserControllerImplTest {
 		
 		verify(service).delete(anyString());	
 	}
+	
+	@Test
+	@DisplayName("Test endpoint delete with resource not found")
+	void testDeleteWithResourceNotFound() {
+		
+		when(service.delete(anyString())).thenThrow(ObjectNotFoundException.class);
+		
+		webTestClient.delete().uri(URI + "/" + ID)
+		.exchange()
+		.expectStatus().isNotFound()
+		.expectBody().consumeWith(System.out::println)
+		.jsonPath("$.path").isEqualTo(URI + "/" + ID)
+		.jsonPath("$.status").isEqualTo(NOT_FOUND.value())
+		.jsonPath("$.error").isEqualTo("Not Found");
+		
+		verify(service).delete(anyString());	
+	}
 
 }
