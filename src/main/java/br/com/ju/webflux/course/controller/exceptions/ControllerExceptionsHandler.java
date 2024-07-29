@@ -21,7 +21,7 @@ import static org.springframework.http.HttpStatus.NOT_FOUND;
 public class ControllerExceptionsHandler {
 	
 	@ExceptionHandler(DuplicateKeyException.class)
-	ResponseEntity<Mono<StandardError>> duplicateKeyException(
+	public ResponseEntity<Mono<StandardError>> duplicateKeyException(
 			DuplicateKeyException ex, ServerHttpRequest request
 			){
 		return ResponseEntity.badRequest()
@@ -31,7 +31,7 @@ public class ControllerExceptionsHandler {
 						.path(request.getPath().toString())
 						.status(BAD_REQUEST.value())
 						.error(BAD_REQUEST.getReasonPhrase())
-						.message(verifyDupKey(ex.getMessage()))
+						.message("E-mail already registered")
 						.build()
 						));
 	}
@@ -51,7 +51,7 @@ public class ControllerExceptionsHandler {
 	}
 	
 	@ExceptionHandler(ObjectNotFoundException.class)
-	ResponseEntity<Mono<StandardError>> objectNotFoundException(
+	public ResponseEntity<Mono<StandardError>> objectNotFoundException(
 			ObjectNotFoundException ex, ServerHttpRequest request
 			){
 		return ResponseEntity.status(NOT_FOUND)
@@ -64,13 +64,6 @@ public class ControllerExceptionsHandler {
 						.path(request.getPath().toString())
 						.build()
 						));
-	}
-	
-	private String verifyDupKey(String message) {
-		if(message.contains("email dup key")) {
-			return "E-mail already registered";
-		}
-		return "Dup key exception";
 	}
 
 }
