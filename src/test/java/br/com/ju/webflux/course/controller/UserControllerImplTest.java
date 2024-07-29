@@ -395,6 +395,28 @@ class UserControllerImplTest {
 	}
 	
 	@Test
+	@DisplayName("Test endpoint update resource not found for email duplicate")
+	void testUpdateResourceNotFoundForEmailDuplicate() {
+		
+		final var request = new UserRequest(NAME, EMAIL, PASSWORD);
+		
+		when(service.update(anyString(), any(UserRequest.class))).thenThrow(DuplicateKeyException.class);
+		
+		webTestClient.patch().uri(URI + "/" + ID)
+		.contentType(APPLICATION_JSON)
+		.body(fromValue(request))
+		.exchange()
+		.expectStatus().isBadRequest()
+		.expectBody().consumeWith(System.out::println)
+		.jsonPath("$.path").isEqualTo(URI + "/" + ID)
+		.jsonPath("$.status").isEqualTo(BAD_REQUEST.value())
+		.jsonPath("$.error").isEqualTo("Bad Request")
+		.jsonPath("$.message").isEqualTo("E-mail already registered");
+		
+		verify(service).update(anyString(), any(UserRequest.class));	
+	}
+	
+	@Test
 	void testDelete() {
 	}
 
