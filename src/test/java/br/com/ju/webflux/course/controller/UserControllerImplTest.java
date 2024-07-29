@@ -35,6 +35,8 @@ import br.com.ju.webflux.course.service.exception.ObjectNotFoundException;
 @AutoConfigureWebTestClient
 class UserControllerImplTest {
 	
+	private static final String URI = "/users";
+
 	private static final String PASSWORD = "123";
 
 	private static final String EMAIL = "sara@mail.com";
@@ -62,7 +64,7 @@ class UserControllerImplTest {
 		
 		when(service.save(any(UserRequest.class))).thenReturn(just(User.builder().build()));
 		
-		webTestClient.post().uri("/users")
+		webTestClient.post().uri(URI)
 		.contentType(APPLICATION_JSON)
 		.body(fromValue(request))
 		.exchange().expectStatus().isCreated();
@@ -75,13 +77,13 @@ class UserControllerImplTest {
 	void testSaveWithBadRequestForNameWithSpaces() {
 		final var request = new UserRequest(NAME.concat(" "), EMAIL, PASSWORD);
 			
-		webTestClient.post().uri("/users")
+		webTestClient.post().uri(URI)
 		.contentType(APPLICATION_JSON)
 		.body(fromValue(request))
 		.exchange()
 		.expectStatus().isBadRequest()
 		.expectBody()
-		.jsonPath("$.path").isEqualTo("/users")
+		.jsonPath("$.path").isEqualTo(URI)
 		.jsonPath("$.status").isEqualTo(BAD_REQUEST.value())
 		.jsonPath("$.error").isEqualTo("Validation Error")
 		.jsonPath("$.message").isEqualTo("Error on validation attributes")
@@ -94,13 +96,13 @@ class UserControllerImplTest {
 	void testSaveWithBadRequestEmptyName() {
 		final var request = new UserRequest(null , EMAIL, PASSWORD);
 			
-		webTestClient.post().uri("/users")
+		webTestClient.post().uri(URI)
 		.contentType(APPLICATION_JSON)
 		.body(fromValue(request))
 		.exchange()
 		.expectStatus().isBadRequest()
 		.expectBody()
-		.jsonPath("$.path").isEqualTo("/users")
+		.jsonPath("$.path").isEqualTo(URI)
 		.jsonPath("$.status").isEqualTo(BAD_REQUEST.value())
 		.jsonPath("$.error").isEqualTo("Validation Error")
 		.jsonPath("$.message").isEqualTo("Error on validation attributes")
@@ -113,13 +115,13 @@ class UserControllerImplTest {
 	void testSaveWithBadRequestNameLengthMin() {
 		final var request = new UserRequest("An", EMAIL, PASSWORD);
 			
-		webTestClient.post().uri("/users")
+		webTestClient.post().uri(URI)
 		.contentType(APPLICATION_JSON)
 		.body(fromValue(request))
 		.exchange()
 		.expectStatus().isBadRequest()
 		.expectBody()
-		.jsonPath("$.path").isEqualTo("/users")
+		.jsonPath("$.path").isEqualTo(URI)
 		.jsonPath("$.status").isEqualTo(BAD_REQUEST.value())
 		.jsonPath("$.error").isEqualTo("Validation Error")
 		.jsonPath("$.message").isEqualTo("Error on validation attributes")
@@ -132,13 +134,13 @@ class UserControllerImplTest {
 	void testSaveWithBadRequestNameLengthMax() {
 		final var request = new UserRequest("Anjhytfdretgjgfrdswatuioplkjhgfdcbnhytfdeljhgfmjouytfdes", EMAIL, PASSWORD);
 			
-		webTestClient.post().uri("/users")
+		webTestClient.post().uri(URI)
 		.contentType(APPLICATION_JSON)
 		.body(fromValue(request))
 		.exchange()
 		.expectStatus().isBadRequest()
 		.expectBody()
-		.jsonPath("$.path").isEqualTo("/users")
+		.jsonPath("$.path").isEqualTo(URI)
 		.jsonPath("$.status").isEqualTo(BAD_REQUEST.value())
 		.jsonPath("$.error").isEqualTo("Validation Error")
 		.jsonPath("$.message").isEqualTo("Error on validation attributes")
@@ -151,13 +153,13 @@ class UserControllerImplTest {
 	void testSaveWithBadRequestInvalidEmail() {
 		final var request = new UserRequest(NAME, "sara.mail.com", PASSWORD);
 			
-		webTestClient.post().uri("/users")
+		webTestClient.post().uri(URI)
 		.contentType(APPLICATION_JSON)
 		.body(fromValue(request))
 		.exchange()
 		.expectStatus().isBadRequest()
 		.expectBody()
-		.jsonPath("$.path").isEqualTo("/users")
+		.jsonPath("$.path").isEqualTo(URI)
 		.jsonPath("$.status").isEqualTo(BAD_REQUEST.value())
 		.jsonPath("$.error").isEqualTo("Validation Error")
 		.jsonPath("$.message").isEqualTo("Error on validation attributes")
@@ -170,13 +172,13 @@ class UserControllerImplTest {
 	void testSaveWithBadRequestEmptyEmail() {
 		final var request = new UserRequest(NAME, null, PASSWORD);
 			
-		webTestClient.post().uri("/users")
+		webTestClient.post().uri(URI)
 		.contentType(APPLICATION_JSON)
 		.body(fromValue(request))
 		.exchange()
 		.expectStatus().isBadRequest()
 		.expectBody()
-		.jsonPath("$.path").isEqualTo("/users")
+		.jsonPath("$.path").isEqualTo(URI)
 		.jsonPath("$.status").isEqualTo(BAD_REQUEST.value())
 		.jsonPath("$.error").isEqualTo("Validation Error")
 		.jsonPath("$.message").isEqualTo("Error on validation attributes")
@@ -189,13 +191,13 @@ class UserControllerImplTest {
 	void testSaveWithBadRequestForPasswordWithSpaces() {
 		final var request = new UserRequest(NAME, EMAIL, PASSWORD.concat(" "));
 			
-		webTestClient.post().uri("/users")
+		webTestClient.post().uri(URI)
 		.contentType(APPLICATION_JSON)
 		.body(fromValue(request))
 		.exchange()
 		.expectStatus().isBadRequest()
 		.expectBody()
-		.jsonPath("$.path").isEqualTo("/users")
+		.jsonPath("$.path").isEqualTo(URI)
 		.jsonPath("$.status").isEqualTo(BAD_REQUEST.value())
 		.jsonPath("$.error").isEqualTo("Validation Error")
 		.jsonPath("$.message").isEqualTo("Error on validation attributes")
@@ -208,13 +210,13 @@ class UserControllerImplTest {
 	void testSaveWithBadRequestEmptyPassword() {
 		final var request = new UserRequest(NAME , EMAIL, null);
 			
-		webTestClient.post().uri("/users")
+		webTestClient.post().uri(URI)
 		.contentType(APPLICATION_JSON)
 		.body(fromValue(request))
 		.exchange()
 		.expectStatus().isBadRequest()
 		.expectBody()
-		.jsonPath("$.path").isEqualTo("/users")
+		.jsonPath("$.path").isEqualTo(URI)
 		.jsonPath("$.status").isEqualTo(BAD_REQUEST.value())
 		.jsonPath("$.error").isEqualTo("Validation Error")
 		.jsonPath("$.message").isEqualTo("Error on validation attributes")
@@ -227,13 +229,13 @@ class UserControllerImplTest {
 	void testSaveWithBadRequestPasswordLengthMin() {
 		final var request = new UserRequest(NAME, EMAIL, "1");
 			
-		webTestClient.post().uri("/users")
+		webTestClient.post().uri(URI)
 		.contentType(APPLICATION_JSON)
 		.body(fromValue(request))
 		.exchange()
 		.expectStatus().isBadRequest()
 		.expectBody()
-		.jsonPath("$.path").isEqualTo("/users")
+		.jsonPath("$.path").isEqualTo(URI)
 		.jsonPath("$.status").isEqualTo(BAD_REQUEST.value())
 		.jsonPath("$.error").isEqualTo("Validation Error")
 		.jsonPath("$.message").isEqualTo("Error on validation attributes")
@@ -246,13 +248,13 @@ class UserControllerImplTest {
 	void testSaveWithBadRequestPasswordLengthMax() {
 		final var request = new UserRequest(NAME, EMAIL, "189546253147896524623589");
 			
-		webTestClient.post().uri("/users")
+		webTestClient.post().uri(URI)
 		.contentType(APPLICATION_JSON)
 		.body(fromValue(request))
 		.exchange()
 		.expectStatus().isBadRequest()
 		.expectBody()
-		.jsonPath("$.path").isEqualTo("/users")
+		.jsonPath("$.path").isEqualTo(URI)
 		.jsonPath("$.status").isEqualTo(BAD_REQUEST.value())
 		.jsonPath("$.error").isEqualTo("Validation Error")
 		.jsonPath("$.message").isEqualTo("Error on validation attributes")
@@ -267,13 +269,13 @@ class UserControllerImplTest {
 		UserRequest request = new UserRequest(NAME, EMAIL, PASSWORD);
 		when(service.save(any())).thenThrow(DuplicateKeyException.class);
 		
-		webTestClient.post().uri("/users")
+		webTestClient.post().uri(URI)
 		.contentType(APPLICATION_JSON)
 		.body(fromValue(request))
 		.exchange()
 		.expectStatus().isBadRequest()
 		.expectBody().consumeWith(System.out::println)
-		.jsonPath("$.path").isEqualTo("/users")
+		.jsonPath("$.path").isEqualTo(URI)
 		.jsonPath("$.status").isEqualTo(BAD_REQUEST.value())
 		.jsonPath("$.error").isEqualTo("Bad Request")
 		.jsonPath("$.message").isEqualTo("E-mail already registered");
@@ -287,7 +289,7 @@ class UserControllerImplTest {
 		when(service.findById(anyString())).thenReturn(just(User.builder().build()));
 		when(mapper.toResponse(any(User.class))).thenReturn(userResponse);
 		
-		webTestClient.get().uri("/users/" + ID)
+		webTestClient.get().uri(URI + "/" + ID)
 		.accept(APPLICATION_JSON)
 		.exchange()
 		.expectStatus().isOk()
@@ -304,7 +306,7 @@ class UserControllerImplTest {
 		
 		when(service.findById(anyString())).thenThrow(ObjectNotFoundException.class);
 		
-		webTestClient.get().uri("/users/" + ID)
+		webTestClient.get().uri(URI + "/"  + ID)
 		.accept(APPLICATION_JSON)
 		.exchange()
 		.expectStatus().isNotFound()
