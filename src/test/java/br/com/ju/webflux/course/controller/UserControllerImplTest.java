@@ -29,6 +29,7 @@ import br.com.ju.webflux.course.model.request.UserRequest;
 import br.com.ju.webflux.course.model.response.UserResponse;
 import br.com.ju.webflux.course.service.UserService;
 import br.com.ju.webflux.course.service.exception.ObjectNotFoundException;
+import reactor.core.publisher.Flux;
 
 @ExtendWith(SpringExtension.class)
 @SpringBootTest
@@ -301,7 +302,7 @@ class UserControllerImplTest {
 	}
 	
 	@Test
-	@DisplayName("Test endpoint find by id with resource not found")
+	@DisplayName("Test endpoint find all with resource not found")
 	void testFindByIdResourceNotFound() {
 		
 		when(service.findById(anyString())).thenThrow(ObjectNotFoundException.class);
@@ -316,7 +317,23 @@ class UserControllerImplTest {
 	}
 	
 	@Test
-	void testFindAll() {
+	@DisplayName("Test endpoint find by id with success")
+	void testFindAllWithSuccess() {
+		
+		final var userResponse = new UserResponse(ID, NAME, EMAIL, PASSWORD);
+		
+		when(service.findAll()).thenReturn(Flux.just(User.builder().build()));
+		when(mapper.toResponse(any(User.class))).thenReturn(userResponse);
+		
+		webTestClient.get().uri(URI)
+		.accept(APPLICATION_JSON)
+		.exchange()
+		.expectStatus().isOk()
+		.expectBody()
+		.jsonPath("$.[0].id").isEqualTo(ID)
+		.jsonPath("$.[0].name").isEqualTo(NAME)
+		.jsonPath("$.[0].email").isEqualTo(EMAIL)
+		.jsonPath("$.[0].password").isEqualTo(PASSWORD);
 	}
 	
 	@Test
