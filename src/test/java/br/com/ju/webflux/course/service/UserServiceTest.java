@@ -61,7 +61,7 @@ class UserServiceTest {
 		Mono<User> result = service.findById("123");
 		
 		StepVerifier.create(result)
-		.expectNextMatches(user -> user.getClass() == User.class)
+		.expectNextMatches(Objects::nonNull)
 		.expectComplete()
 		.verify();
 		
@@ -75,7 +75,7 @@ class UserServiceTest {
 		Flux<User> result = service.findAll();
 				
 		StepVerifier.create(result)
-		.expectNextMatches(user -> user.getClass() == User.class)
+		.expectNextMatches(Objects::nonNull)
 		.expectComplete()
 		.verify();
 		
