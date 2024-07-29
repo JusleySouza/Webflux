@@ -17,6 +17,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.reactive.AutoConfigureWebTestClient;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.dao.DuplicateKeyException;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.reactive.server.WebTestClient;
 
@@ -53,7 +54,7 @@ class UserControllerImplTest {
 	
 	@MockBean
 	private MongoClient mongoClient;
-
+		
 	@Test
 	@DisplayName("Test endpoint save and success")
 	void testSaveWithSuccess() {
@@ -219,6 +220,25 @@ class UserControllerImplTest {
 		.jsonPath("$.message").isEqualTo("Error on validation attributes")
 		.jsonPath("$.errors[0].fieldName").isEqualTo("password")
 		.jsonPath("$.errors[0].message").isEqualTo("must be between 3 and 20 characters");
+	}
+	
+	@Test
+	@DisplayName("Test endpoint save with bad request for duplicate email")
+	void testSaveWithBadRequestForEmailDuplicate() {
+		
+		UserRequest request = new UserRequest(NAME, EMAIL, PASSWORD);
+		when(service.save(any())).thenThrow(DuplicateKeyException.class);
+		
+		webTestClient.post().uri("/users")
+		.contentType(APPLICATION_JSON)
+		.body(fromValue(request))
+		.exchange()
+		.expectStatus().isBadRequest()
+		.expectBody().consumeWith(System.out::println)
+		.jsonPath("$.path").isEqualTo("/users")
+		.jsonPath("$.status").isEqualTo(BAD_REQUEST.value())
+		.jsonPath("$.error").isEqualTo("Bad Request")
+		.jsonPath("$.message").isEqualTo("E-mail already registered");
 	}
 	
 	@Test
