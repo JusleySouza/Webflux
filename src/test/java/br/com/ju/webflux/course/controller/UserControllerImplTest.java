@@ -348,7 +348,7 @@ class UserControllerImplTest {
 	
 	@Test
 	@DisplayName("Test endpoint update with success")
-	void testUpdate() {
+	void testUpdateWithSuccess() {
 		
 		final var request = new UserRequest(NAME, EMAIL, PASSWORD);
 		final var userResponse = new UserResponse(ID, NAME, EMAIL, PASSWORD);
@@ -369,6 +369,29 @@ class UserControllerImplTest {
 		
 		verify(service).update(anyString(), any(UserRequest.class));	
 		verify(mapper).toResponse(any(User.class));
+	}
+	
+	@Test
+	@DisplayName("Test endpoint update resource not found")
+	void testUpdateResourceNotFound() {
+		
+		final var request = new UserRequest(NAME, EMAIL, PASSWORD);
+		final var userResponse = new UserResponse(ID, NAME, EMAIL, PASSWORD);
+		
+		when(service.update(anyString(), any(UserRequest.class))).thenThrow(ObjectNotFoundException.class);
+		when(mapper.toResponse(any(User.class))).thenReturn(userResponse);
+		
+		webTestClient.patch().uri(URI + "/" + ID)
+		.contentType(APPLICATION_JSON)
+		.body(fromValue(request))
+		.exchange()
+		.expectStatus().isNotFound()
+		.expectBody().consumeWith(System.out::println)
+		.jsonPath("$.path").isEqualTo(URI + "/" + ID)
+		.jsonPath("$.status").isEqualTo(NOT_FOUND.value())
+		.jsonPath("$.error").isEqualTo("Not Found");
+		
+		verify(service).update(anyString(), any(UserRequest.class));	
 	}
 	
 	@Test
