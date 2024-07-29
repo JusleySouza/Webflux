@@ -6,10 +6,12 @@ import org.springframework.data.mongodb.core.mapping.Document;
 
 import lombok.Builder;
 import lombok.Data;
+import lombok.Generated;
 
 @Data
 @Builder
 @Document
+@Generated
 public class User {
 	
 	@Id

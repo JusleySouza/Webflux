@@ -6,12 +6,14 @@ import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Repository;
 
 import br.com.ju.webflux.course.entity.User;
+import lombok.Generated;
 import lombok.RequiredArgsConstructor;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 @Repository
 @RequiredArgsConstructor
+@Generated
 public class UserRepository {
 	
 	private final ReactiveMongoTemplate mongoTemplate;

@@ -6,9 +6,11 @@ import java.time.LocalDateTime;
 
 import lombok.Builder;
 import lombok.Data;
+import lombok.Generated;
 
 @Data
 @Builder
+@Generated
 public class StandardError implements Serializable{
 	
 	@Serial
