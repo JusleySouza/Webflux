@@ -27,18 +27,24 @@ import reactor.test.StepVerifier;
 
 @ExtendWith(MockitoExtension.class)
 class UserServiceTest {
-	
-	@Mock
-	private UserRepository repository;
+
 	@Mock
 	private UserMapper mapper;
 
 	@InjectMocks
 	private UserService service;
+	
+	@Mock
+	private UserRepository repository;
+	
+	private static final String ID = "12345";
+	private static final String PASSWORD = "123";
+	private static final String NAME = "Sara Mello";
+	private static final String EMAIL = "sara@mail.com";
 
 	@Test
 	void testSave() {
-		UserRequest request = new UserRequest("Sara Mello", "sara@mail.com", "123");
+		UserRequest request = new UserRequest(NAME, EMAIL, PASSWORD);
 		User entity = User.builder().build();
 		
 		when(mapper.toEntity(any(UserRequest.class))).thenReturn(entity);
@@ -58,7 +64,7 @@ class UserServiceTest {
 	void testFindById() {
 		when(repository.findById(anyString())).thenReturn(Mono.just(User.builder().build()));
 		
-		Mono<User> result = service.findById("123");
+		Mono<User> result = service.findById(ID);
 		
 		StepVerifier.create(result)
 		.expectNextMatches(Objects::nonNull)
@@ -84,14 +90,14 @@ class UserServiceTest {
 	
 	@Test
 	void testUpdate() {
-		UserRequest request = new UserRequest("Sara Mello", "sara@mail.com", "123");
+		UserRequest request = new UserRequest(NAME, EMAIL, PASSWORD);
 		User entity = User.builder().build();
 		
 		when(mapper.toEntity(any(UserRequest.class), any(User.class))).thenReturn(entity);
 		when(repository.findById(anyString())).thenReturn(Mono.just(entity));
 		when(repository.save(any(User.class))).thenReturn(Mono.just(entity));
 		
-		Mono<User> result = service.update("123", request);
+		Mono<User> result = service.update(ID, request);
 		
 		StepVerifier.create(result)
 		.expectNextMatches(Objects::nonNull)
@@ -106,7 +112,7 @@ class UserServiceTest {
 		User entity = User.builder().build();
 		when(repository.findAndRemove(anyString())).thenReturn(Mono.just(entity));
 		
-		Mono<User> result = service.delete("123");
+		Mono<User> result = service.delete(ID);
 		
 		StepVerifier.create(result)
 		.expectNextMatches(Objects::nonNull)
@@ -121,10 +127,10 @@ class UserServiceTest {
 		when(repository.findById(anyString())).thenReturn(Mono.empty());
 		
 		try {
-			service.findById("123").block();
+			service.findById(ID).block();
 		} catch (Exception ex) {
 			assertEquals(ObjectNotFoundException.class, ex.getClass());
-			assertEquals(format("Object not found. Id: %s, Type: %s ", "123", User.class.getSimpleName()),
+			assertEquals(format("Object not found. Id: %s, Type: %s ", ID, User.class.getSimpleName()),
 					ex.getMessage());
 		}
 	}

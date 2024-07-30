@@ -35,28 +35,24 @@ import reactor.core.publisher.Flux;
 @SpringBootTest
 @AutoConfigureWebTestClient
 class UserControllerImplTest {
-	
-	private static final String URI = "/users";
 
-	private static final String PASSWORD = "123";
-
-	private static final String EMAIL = "sara@mail.com";
-
-	private static final String NAME = "Sara Mello";
-
-	private static final String ID = "123456";
-
-	@Autowired
-	private WebTestClient webTestClient;
+	@MockBean
+	private UserMapper mapper;
 	
 	@MockBean
 	private UserService service;
 	
 	@MockBean
-	private UserMapper mapper;
-	
-	@MockBean
 	private MongoClient mongoClient;
+	
+	@Autowired
+	private WebTestClient webTestClient;
+	
+	private static final String ID = "123456";
+	private static final String URI = "/users";
+	private static final String PASSWORD = "123";
+	private static final String NAME = "Sara Mello";
+	private static final String EMAIL = "sara@mail.com";
 		
 	@Test
 	@DisplayName("Test endpoint save and success")
